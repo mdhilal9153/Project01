@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
 import {ArrowRight} from 'lucide-react'
+import { useNavigate } from 'react-router-dom';
+import {useInterviewContext} from '../../context/InterviewContext';
 
 const InfoForm = () => {
+
+    const { addToInterview } = useInterviewContext();
+    const navigate = useNavigate();
 
     const [name, setName] = useState('');
     const [role, setRole] = useState('');
@@ -19,8 +24,15 @@ const InfoForm = () => {
     }
 
     const submitHandler = (e) => {
-        console.log('submitted');
         e.preventDefault();
+        addToInterview({
+            type: "user_info",
+            name,
+            role,
+            experience: btn,
+            aim
+        });
+        navigate('/interview');
     }
 
     const nameC = (e) => {
@@ -79,7 +91,7 @@ const InfoForm = () => {
             <button type='button' onClick={() => arrC(0)} className={`border mr-2 py-2 px-6 rounded-full transition-all bg-[#1b2029] hover:bg-[#282c36] ${aim[0]? 'border-[#00E676] text-[#00E676]': 'text-[#808080] border-[#808080]'}`}>Land first job</button>
             <button type='button' onClick={() => arrC(1)} className={`border mr-2 py-2 px-6 rounded-full transition-all bg-[#1b2029] hover:bg-[#282c36] ${aim[1]? 'border-[#00E676] text-[#00E676]': 'text-[#808080] border-[#808080]'}`}>Switch companies</button>
             <button type='button' onClick={() => arrC(2)} className={`border mr-2 py-2 px-6 rounded-full transition-all bg-[#1b2029] hover:bg-[#282c36] ${aim[2]? 'border-[#00E676] text-[#00E676]': 'text-[#808080] border-[#808080]'}`}>Crack FAANG</button>
-            <button type='button' onClick={() => arrC(3)} className={`border mr-2 py-2 px-6 rounded-full transition-all bg-[#1b2029] hover:bg-[#282c36] ${aim[3]? 'border-[#00E676] text-[#00E676]': 'text-[#808080] border-[#80808₀]'}`}>Freelancing</button>
+            <button type='button' onClick={() => arrC(3)} className={`border mr-2 py-2 px-6 rounded-full transition-all bg-[#1b2029] hover:bg-[#282c36] ${aim[3]? 'border-[#00E676] text-[#00E676]': 'text-[#808080] border-[#808080]'}`}>Freelancing</button>
         </div>
 
 
