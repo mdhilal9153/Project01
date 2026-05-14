@@ -1,6 +1,6 @@
 import React from 'react'
 
-const StatsPanel = () => {
+const StatsPanel = ({transcript,listening}) => {
   return (
     <div className='flex flex-col p-3 w-[30%] gap-3'>
         <h1 className='text-white font-bold text-xl'>Live Stats</h1>
@@ -63,7 +63,7 @@ const StatsPanel = () => {
         </div>
         <div className=' flex flex-col justify-start gap-4 border border-white/20 rounded-lg bg-[#151822] p-3'>
           <p className='text-white font-semibold'>Transcript</p>
-          <p className='text-white/50 text-sm'>I think one of the most challenging situations I faced was when I was working on a project with a team member who had very different working styles..</p>
+          <p className='text-white/50 text-sm'>{transcript}</p>
         </div>
 
     </div>

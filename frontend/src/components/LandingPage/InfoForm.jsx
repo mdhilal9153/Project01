@@ -32,6 +32,8 @@ const InfoForm = () => {
             experience: btn,
             aim
         });
+
+        console.log(name, role, btn, aim);
         navigate('/interview');
     }
 
