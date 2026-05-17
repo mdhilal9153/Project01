@@ -21,7 +21,9 @@ function fileToGenerativePart(base64String, mimeType) {
 
 app.post('/api/chat',async (req,res) =>{
     
-    const  {transcript,interviewData,image} = req.body;
+    const  {interviewData,image,transcript} = req.body;
+
+    console.log(interviewData);
 
     try{
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });

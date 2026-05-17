@@ -59,7 +59,7 @@ const useInterview = (webcamRef) => {
         recognitionRef.current.stop();
         setListening(false);
         const img = webcamRef.current.getScreenshot();
-        console.log(interviewData.length);
+        
         setLoading(true);
         const {data} = await axios.post("http://localhost:5000/api/chat",{
             interviewData,

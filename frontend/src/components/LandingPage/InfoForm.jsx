@@ -18,9 +18,9 @@ const InfoForm = () => {
     const arrC = (num) => {
         let arr = [...aim];
         arr[num] = !arr[num];
-        console.log(aim);
+        
         setAim(arr);
-        console.log(aim);
+        
     }
 
     const submitHandler = (e) => {
@@ -33,17 +33,17 @@ const InfoForm = () => {
             aim
         });
 
-        console.log(name, role, btn, aim);
+        
         navigate('/interview');
     }
 
     const nameC = (e) => {
-        console.log(name);
+        
         setName(e.target.value);
     }
 
     const roleC = (e) => {
-        console.log(role);
+        
         setRole(e.target.value);
     }
 
