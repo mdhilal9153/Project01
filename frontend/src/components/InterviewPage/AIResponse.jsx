@@ -1,7 +1,7 @@
 import React from 'react'
 import { Camera, Volume2 } from 'lucide-react'
 
-const AIResponse = ({startListening,stopListening,listening}) => {
+const AIResponse = ({startListening,stopListening,listening,aiReply,loading}) => {
   return (
     <div className='flex flex-col gap-5 p-4 border border-white/20 rounded-lg bg-[#10141e]'>
         <div className='flex gap-3'>
@@ -9,7 +9,9 @@ const AIResponse = ({startListening,stopListening,listening}) => {
             <p className='text-white'>AI Interviewer</p>
         </div>
 
-        <p className='text-white'>Tell me about a time when you had to work with a difficult team member. How did you handle the situation, and what was the outcome?</p>
+        <p className='text-white'>
+          {loading? "AI is thinking...": aiReply || "Press start to begin"}
+        </p>
 
         <div className='flex gap-4 w-full'>
             

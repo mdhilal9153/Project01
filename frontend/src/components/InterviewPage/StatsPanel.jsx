@@ -1,6 +1,6 @@
 import React from 'react'
 
-const StatsPanel = ({transcript,listening}) => {
+const StatsPanel = ({transcript,listening, confidenceScore, wpm, fillerCount, wordCount}) => {
   return (
     <div className='flex flex-col p-3 w-[30%] gap-3'>
         <h1 className='text-white font-bold text-xl'>Live Stats</h1>
@@ -16,22 +16,22 @@ const StatsPanel = ({transcript,listening}) => {
         <div className='border border-white/20 bg-[#10141e] flex flex-col px-3 py-4 gap-4 justify-start rounded-lg'>
           <div className='flex justify-between w-full'>
             <p className='text-white/40 font-semibold'>Speech Pace</p>
-            <span className='text-blue-400 text-sm'>145wpm</span>
+            <span className='text-blue-400 text-sm'>{wpm} wpm</span>
           </div>
 
           <div className='bg-[#1c2029] rounded-3xl w-full flex items-center'>
-            <div className='bg-blue-400 rounded-full w-[70%] h-[10px]'></div>
+            <div className='bg-blue-400 rounded-full h-[10px]' style={{ width: `${Math.min(wpm / 200 * 100, 100)}%` }}></div>
           </div>
         </div>
 
         <div className='border border-white/20 bg-[#10141e] flex flex-col px-3 py-4 gap-4 justify-start rounded-lg'>
           <div className='flex justify-between w-full'>
             <p className='text-white/40 font-semibold'>Confidence score</p>
-            <span className='text-green-300 text-sm'>9.2/10</span>
+            <span className='text-green-300 text-sm'>{confidenceScore}/10</span>
           </div>
 
           <div className='bg-[#1c2029] rounded-3xl w-full flex items-center'>
-            <div className='bg-green-300 rounded-full w-[92%] h-[10px]'></div>
+            <div className='bg-green-300 rounded-full h-[10px]' style={{ width: `${confidenceScore * 10}%` }}></div>
           </div>
         </div>
 
@@ -41,17 +41,17 @@ const StatsPanel = ({transcript,listening}) => {
           <div className='grid grid-cols-2 w-full gap-3'>
               <div className='flex flex-col justify-start gap-2 p-2 border border-white/20 rounded-lg bg-[#151822]'>
                 <p className='text-white/50 text-sm'>Filler Words</p>
-                <span className='text-white'>3</span>
+                <span className='text-white'>{fillerCount}</span>
               </div>
 
               <div className='flex flex-col justify-start gap-2 p-2 border border-white/20 rounded-lg bg-[#151822]'>
                 <p className='text-white/50 text-sm'>Word Count</p>
-                <span className='text-white'>247</span>
+                <span className='text-white'>{wordCount}</span>
               </div>
 
               <div className='flex flex-col justify-start gap-2 p-2 border border-white/20 rounded-lg bg-[#151822]'>
                 <p className='text-white/50 text-sm'>WPM</p>
-                <span className='text-blue-400'>145</span>
+                <span className='text-blue-400'>{wpm}</span>
               </div>
 
               <div className='flex flex-col justify-start gap-2 p-2 border border-white/20 rounded-lg bg-[#151822]'>
