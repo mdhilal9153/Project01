@@ -11,8 +11,30 @@ const useInterview = (webcamRef) => {
     const [aiReply, setAiReply] = useState('');
     const [loading, setLoading] = useState(false);
     const [timeElapsed, setTimeElapsed] = useState(0);
+    const [stressMode, setStressMode] = useState(false);
+
+    const questionCount = interviewData.length-1 < 0? 0:interviewData.length-1;
+
+    const toggleMode = () => {
+        setStressMode(!stressMode);
+    }
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+    const getFirstQuestion = async () => {
+        setLoading(true);
+        const { data } = await axios.post("http://localhost:5000/api/chat", {
+        updatedData:interviewData,
+        image: null,
+        transcript: "Start the interview"
+        });
+        setLoading(false);
+        setAiReply(data.reply);
+    }
+
+    getFirstQuestion();
+    }, [])
 
 
     useEffect(() => {
@@ -59,30 +81,66 @@ const useInterview = (webcamRef) => {
         recognitionRef.current.stop();
         setListening(false);
         const img = webcamRef.current.getScreenshot();
-        
-        setLoading(true);
-        const {data} = await axios.post("http://localhost:5000/api/chat",{
-            interviewData,
-            image:img,
-            transcript
-        })
-        setLoading(false);
 
-
-        setAiReply(data.reply);
+        const updatedData = [
+            ...interviewData,
+            {
+            type: "qa",
+            q: aiReply,
+            a: transcript
+            }
+        ];
 
         addToInterview({
             type:"Question and answer",
-            q:data.reply,
+            q:aiReply,
             a:transcript
         })
+        
+        try{
+            setLoading(true);
+            const {data} = await axios.post("http://localhost:5000/api/chat",{
+                updatedData,
+                image:img,
+                transcript,
+                stressMode
+            })
+            setLoading(false);
 
-        if (interviewData.length + 1 === 6) {
+
+            setAiReply(data.reply);
+
+        }catch(err){
+            console.log(err);
+            setAiReply("Something went wrong, try again later...");
+        }
+
+        if (updatedData.length === 6) {
            navigate('/results');
         }
     }
 
-    return { transcript, listening, startListening, stopListening, aiReply, loading, wordCount, fillerCount, wpm, confidenceScore };
+    const analyzeFace = async () => {
+        const img = webcamRef.current.getScreenshot();
+
+        try{
+            setLoading(true);
+            const {data} = await axios.post("http://localhost:5000/api/chat",{
+                updatedData:interviewData,
+                image:img,
+                transcript:"",
+                stressMode
+            })
+            setLoading(false);
+
+            setAiReply(data.reply);
+        }catch(err){
+            console.log(err);
+            setAiReply("Something went wrong, try again later...");
+        }
+    }
+
+    return { transcript, listening, startListening, stopListening, aiReply, loading, wordCount, fillerCount, wpm, confidenceScore, questionCount, stressMode,toggleMode,analyzeFace};
 }
 
 export default useInterview;

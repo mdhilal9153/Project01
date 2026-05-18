@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle } from 'react'
 import { useRef, useEffect } from 'react'
 
 
-const WebcamFeed = forwardRef((props,ref) => {
+const WebcamFeed = forwardRef(({cameraOn},ref) => {
 
     const videoRef = useRef(null);
     const streamRef = useRef(null);
@@ -35,11 +35,22 @@ const WebcamFeed = forwardRef((props,ref) => {
 
     },[])
 
+    useEffect(() => {
+      if (streamRef.current) {
+        streamRef.current.getVideoTracks()[0].enabled = cameraOn;
+      }
+    }, [cameraOn]);
+
 
   return (
-    <div className='h-[350px] w-full rounded-lg overflow-hidden bg-[#10141e] border border-white/20'>
+    <div className='relative h-[350px] w-full rounded-lg overflow-hidden bg-[#10141e] border border-white/20'>
         <video ref={videoRef} autoPlay muted 
         className='w-full h-full object-cover'></video>
+        {!cameraOn && (
+          <div className='absolute inset-0 flex items-center justify-center bg-[#10141e]'>
+            <p className='text-white/30'>Camera Off</p>
+          </div>
+        )}
     </div>
   )
 })

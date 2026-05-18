@@ -21,42 +21,69 @@ function fileToGenerativePart(base64String, mimeType) {
 
 app.post('/api/chat',async (req,res) =>{
     
-    const  {interviewData,image,transcript} = req.body;
+    const  {updatedData,image,transcript,stressMode} = req.body;
 
-    console.log(interviewData);
+    console.log(updatedData);
+
+    const modeInstruction = stressMode? `Be very aggressive, interrupt with follow-ups, challenge every answer skeptically,show impatience, give harsh feedback. Create pressure intentionally.`
+      : `Be professional and calm. Give balanced feedback.`;
 
     try{
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const userInfo = interviewData[0];
-        const QAs = interviewData.slice(1);
+        const userInfo = updatedData[0];
+        const QAs = updatedData.slice(1);
+
+        const experienceMap = { 1: 'Beginner', 2: 'Intermediate', 3: 'Advanced' };
+        const aimLabels = ['Land First Job', 'Switch Companies', 'Crack FAANG', 'Freelancing'];
+        const selectedAims = userInfo.aim
+          .map((selected, index) => selected ? aimLabels[index] : null)
+          .filter(Boolean)
+          .join(', ');
 
         const prompt = `
-        You are a professional technical interviewer who has immense knowledge of tech sector, You are interviewing a candidate whose 
-        details are ${userInfo}.
-        
-        This is the questions and answers array attached up till now ${QAs}. If the array is empty that means this is the first question.
-        If the array contains question and answer pairs, take that as a reference and ask a question that is reletively harder than privous one
-        and tend to relate with the questions asked before but do not repeat the question. The questions should align with the roles and the aim
-        of the candidate.
-        
-        IMPORTANT- The answer should be in a strict and presentable format. Before asking the question review the most recent question and 
-        candidate's answer, review that and give the score for the answer out of 10.Give a very short brief of review of candidate's 
-        answer before asking the question in paragrapgh (NO bullet points, no fluff).
-        
-       STRICT OUTPUT FORMAT - follow this exactly, no deviation:
+        You are a professional technical interviewer with deep knowledge of the tech sector. 
+        You are interviewing the following candidate:
 
-        [Score: X/10]
-        [2-3 sentence feedback on the answer and body language]
-        [Next question]
+        - Name: ${userInfo.name}
+        - Target Role: ${userInfo.role}
+        - Experience Level: ${experienceMap[userInfo.experience]}
+        - Interview Goal: ${selectedAims}
 
-        Example:
-        7/10
-        Your explanation was surface level and lacked depth on the event loop internals. Eye contact was inconsistent suggesting nervousness.
-        What is the difference between setTimeout and Promise.resolve() in terms of execution order?`;
+        CONVERSATION HISTORY:
+        ${QAs.length === 0 
+          ? "No questions asked yet. This is the first question." 
+          : QAs.map((qa, i) => `Q${i+1}: ${qa.q}\nA${i+1}: ${qa.a}`).join('\n\n')
+        }
 
-        const imagePart = fileToGenerativePart(image, "image/jpeg");
-        const result = await model.generateContent([prompt,imagePart]);
+        ${QAs.length > 0 
+          ? `Also analyze the candidate's body language and confidence from the attached image.
+            Review their most recent answer and provide a score and brief feedback before asking the next question.
+            Each question should be progressively harder than the previous one and relate to prior answers.`
+          : `Ask the first opening technical question appropriate for a ${experienceMap[userInfo.experience]} level ${userInfo.role} candidate.`
+        }
+
+        STRICT OUTPUT FORMAT — no deviation:
+        ${QAs.length > 0 ? `X/10
+        [2-3 sentence feedback on answer and body language. Be blunt and professional.]
+        [Next question]` 
+        : `[Opening question only. No score or feedback for the first question.]`}
+
+        RULES:
+        - No bullet points, no fluff, no pleasantries
+        - Do not repeat any previous question
+        - Questions must align with the candidate's role and goal
+        - Be direct and professional like a real senior interviewer
+        - Do NOT ask questions that require the candidate to write code. 
+          This is a verbal interview only. Ask conceptual, theoretical, 
+          and scenario-based questions instead. For coding topics, ask 
+          the candidate to verbally explain the logic, approach, or 
+          thought process instead of writing actual code.
+        - ${modeInstruction}`;
+
+        const imagePart = image ? fileToGenerativePart(image, "image/jpeg") : null;
+        const contentParts = imagePart ? [prompt, imagePart] : [prompt];
+        const result = await model.generateContent(contentParts);
 
         const aiText = result.response.text();
         res.json({ reply: aiText });
