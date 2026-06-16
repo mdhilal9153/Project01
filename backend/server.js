@@ -6,6 +6,8 @@ const port = 5000;
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI2 = new GoogleGenerativeAI(process.env.RESULT_KEY);
+
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -93,5 +95,79 @@ app.post('/api/chat',async (req,res) =>{
     }
 
 })
+
+app.post('/api/result',async(req,res) =>{
+  const {updatedData} = req.body;
+
+  try{
+    const model = genAI2.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+
+    const userInfo = updatedData[0];
+    const QAs = updatedData.slice(1);
+    const experienceMap = { 1: 'Beginner', 2: 'Intermediate', 3: 'Advanced' };
+    const aimLabels = ['Land First Job', 'Switch Companies', 'Crack FAANG', 'Freelancing'];
+    const selectedAims = userInfo.aim
+      .map((selected, index) => selected ? aimLabels[index] : null)
+      .filter(Boolean)
+      .join(', ');
+
+    const prompt = `
+      You are evaluating a completed mock technical interview. Analyze the following interview data and return a comprehensive assessment.
+
+      CANDIDATE INFO:
+      - Name: ${userInfo.name}
+      - Role: ${userInfo.role}
+      - Experience Level: ${experienceMap[userInfo.experience]}
+      - Goal: ${selectedAims}
+
+      INTERVIEW QUESTIONS AND ANSWERS:
+      ${QAs.map((qa, i) => `
+      Q${i + 1}: ${qa.q}
+      Answer: ${qa.a}
+      `).join('\n')}
+
+      YOUR TASK:
+      Evaluate each answer and the overall interview performance. Consider technical accuracy, communication clarity, confidence, and relevance to the target role.
+
+      Return ONLY a valid JSON object. No markdown, no backticks, no explanation, no extra text before or after. Just the raw JSON.
+
+      The JSON must follow this exact structure:
+      {
+        "overallScore": <number between 0-10 with one decimal>,
+        "verdict": <one short phrase like "Ready for Junior Roles" or "Needs More Preparation">,
+        "strengths": [<string>, <string>, <string>],
+        "improvements": [<string>, <string>, <string>],
+        "overallFeedback": <2-3 sentence paragraph summarizing the full interview performance>,
+        "questionBreakdown": [
+          {
+            "score": <number between 0-10>,
+            "feedback": <one sentence honest feedback on this specific answer>
+          }
+        ]
+      }
+
+      RULES:
+      - questionBreakdown must have exactly 5 items in order
+      - overallScore should be the weighted average of all question scores
+      - verdict must be concise — maximum 5 words
+      - strengths and improvements must each have exactly 3 items
+      - Be blunt and honest — this feedback will help the candidate improve
+      - Do not include the question text in questionBreakdown, only score and feedback
+      `;
+
+      const data = await model.generateContent(prompt);
+      const rawText = data.response.text()
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+      const result = JSON.parse(rawText);
+      res.json(result);
+  } catch(err){
+      console.log(err);
+      res.status(500).json("Request failed..")
+  }
+
+});
 
 app.listen(port,() => console.log("Server listening on port 5000"));
