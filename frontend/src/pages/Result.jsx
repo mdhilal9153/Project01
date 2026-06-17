@@ -38,7 +38,7 @@ const Result = () => {
 
         <StatsSec results={results} totalWords={totalWords} totalFillers={totalFillers} fillerPercent={fillerPercent} role={interviewData[0].role}/>
 
-        <Details results={results} interviewData={interviewData}/>
+        <Details results={results} interviewData={interviewData} totalWords={totalWords} totalFillers={totalFillers} fillerPercent={fillerPercent}/>
     </div>
   )
 }
