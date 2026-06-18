@@ -12,7 +12,7 @@ const Footer = () => {
             <p className='inline mr-4 transition-all hover:text-white cursor-pointer'>Contact</p>
         </div>
 
-        <p className='text-[#91949d]'>© 2026 MockMate AI. All rights reserved.</p>
+        {/* <p className='text-[#91949d]'>© 2026 MockMate AI. All rights reserved.</p> */}
       
     </div>
   )

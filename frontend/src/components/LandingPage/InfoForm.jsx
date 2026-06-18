@@ -97,7 +97,7 @@ const InfoForm = () => {
         </div>
 
 
-        <button type='submit' className='bg-[#00E5FF] text-[#0B0F19] mt-5 w-full rounded-2xl py-1 flex justify-center items-center text-lg'>
+        <button type='submit' className='bg-[#00E5FF] text-[#0B0F19] mt-5 w-full rounded-2xl py-1 flex justify-center items-center text-lg hover:scale-98 transition-all'>
             Start Interview<ArrowRight/>
         </button>
 

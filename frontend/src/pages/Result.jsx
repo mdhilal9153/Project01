@@ -19,6 +19,11 @@ const Result = () => {
   const fillerPercent = totalWords > 0 ? ((totalFillers / totalWords) * 100).toFixed(1) : 0;
 
   useEffect(() => {
+    if (interviewData.length === 0) {
+      navigate('/');  // redirect back to landing if no data
+      return;
+    }
+    
     const fetchResults = async () => {
       const { data } = await axios.post("http://localhost:5000/api/result", {
         updatedData: interviewData
@@ -26,6 +31,7 @@ const Result = () => {
       setResults(data);
       setLoading(false);
     }
+
     fetchResults();
   }, [])
 

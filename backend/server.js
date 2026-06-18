@@ -25,6 +25,10 @@ app.post('/api/chat',async (req,res) =>{
     
     const  {updatedData,image,transcript,stressMode} = req.body;
 
+    if (!updatedData || updatedData.length === 0) {
+      return res.status(400).json({ error: "No interview data provided" });
+    }
+
     console.log(updatedData);
 
     const modeInstruction = stressMode? `Be very aggressive, interrupt with follow-ups, challenge every answer skeptically,show impatience, give harsh feedback. Create pressure intentionally.`
@@ -97,7 +101,12 @@ app.post('/api/chat',async (req,res) =>{
 })
 
 app.post('/api/result',async(req,res) =>{
+
   const {updatedData} = req.body;
+
+  if (!updatedData || updatedData.length === 0) {
+    return res.status(400).json({ error: "No interview data provided" });
+  }
 
   try{
     const model = genAI2.getGenerativeModel({ model: "gemini-2.5-flash" });
